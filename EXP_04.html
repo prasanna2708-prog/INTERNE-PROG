@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Train Reservation System</title>
+<style>
+*{box-sizing:border-box}body{margin:0;font-family:Arial,sans-serif;background:#f4f7fb;color:#1d2939}
+header{background:#173b68;color:white;padding:24px 5%;}header p{margin-bottom:0}
+main{max-width:1000px;margin:24px auto;padding:0 16px}
+.search{width:100%;padding:12px;border:1px solid #ccd5e0;border-radius:8px;margin:10px 0 18px;font-size:16px}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:14px}
+.card,.panel{background:white;padding:18px;border-radius:12px;box-shadow:0 2px 8px #14213d12}
+button{background:#1769aa;color:white;border:0;padding:10px 14px;border-radius:7px;cursor:pointer}
+button:hover{background:#104d80}label{display:block;margin:12px 0}input,select{padding:9px;border:1px solid #ccd5e0;border-radius:6px;max-width:100%}
+.panel{margin-top:22px}.note{font-size:13px;color:#5b6573}footer{text-align:center;padding:22px;color:#5b6573}
+</style></head>
+<body>
+<header><h1>Train Reservation System</h1><p>Internet Programming Lab — Experiment 4</p></header>
+<main>
+<p>Search trains and create a demo reservation.</p>
+<input class="search" id="searchBox" placeholder="Search trains..." oninput="filterCards()">
+<div class="grid" id="cardGrid"><article class="card"><h3>Chennai Express</h3><p>Sample train item for this experiment.</p><button onclick="selectItem(this, 'Chennai Express')">Select</button></article>
+<article class="card"><h3>Pandian Express</h3><p>Sample train item for this experiment.</p><button onclick="selectItem(this, 'Pandian Express')">Select</button></article>
+<article class="card"><h3>Vaigai Express</h3><p>Sample train item for this experiment.</p><button onclick="selectItem(this, 'Vaigai Express')">Select</button></article>
+<article class="card"><h3>Shatabdi Express</h3><p>Sample train item for this experiment.</p><button onclick="selectItem(this, 'Shatabdi Express')">Select</button></article></div>
+
+<section class="panel"><h2>Demo Form</h2>
+<label>Your name <input id="personName" placeholder="Enter your name"></label>
+<label>Choose item <select id="chosen"><option>Chennai Express</option><option>Pandian Express</option><option>Vaigai Express</option><option>Shatabdi Express</option></select></label>
+<label>Details <input id="details" placeholder="Enter a date, note, or details"></label>
+<button onclick="submitDemo()">Submit</button><p id="formResult" aria-live="polite"></p>
+</section>
+<script>
+function submitDemo(){
+ const name=document.getElementById('personName').value.trim();
+ if(!name){document.getElementById('formResult').textContent='Please enter your name.';return;}
+ document.getElementById('formResult').textContent='Demo submitted for '+name+' — '+document.getElementById('chosen').value+'. No data is sent to a server.';
+}
+</script>
+<p class="note">Student practice version: this is a front-end demo. Login, database storage, real payments, email/SMS, live availability and admin security require a backend and are not implemented here.</p>
+</main><footer>Internet Programming Lab · Experiment 4</footer>
+<script>
+function filterCards(){let q=document.getElementById('searchBox').value.toLowerCase();document.querySelectorAll('.card').forEach(c=>c.style.display=c.innerText.toLowerCase().includes(q)?'':'none')}
+function selectItem(btn,item){document.getElementById('chosen')?.querySelector('option');let result=document.getElementById('formResult');if(result){let sel=document.getElementById('chosen');if(sel)sel.value=item;result.textContent=item+' selected.'}else{alert(item+' selected')}}
+</script></body></html>

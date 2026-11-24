@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Online Placement Examination</title>
+<style>
+*{box-sizing:border-box}body{margin:0;font-family:Arial,sans-serif;background:#f4f7fb;color:#1d2939}
+header{background:#173b68;color:white;padding:24px 5%;}header p{margin-bottom:0}
+main{max-width:1000px;margin:24px auto;padding:0 16px}
+.search{width:100%;padding:12px;border:1px solid #ccd5e0;border-radius:8px;margin:10px 0 18px;font-size:16px}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:14px}
+.card,.panel{background:white;padding:18px;border-radius:12px;box-shadow:0 2px 8px #14213d12}
+button{background:#1769aa;color:white;border:0;padding:10px 14px;border-radius:7px;cursor:pointer}
+button:hover{background:#104d80}label{display:block;margin:12px 0}input,select{padding:9px;border:1px solid #ccd5e0;border-radius:6px;max-width:100%}
+.panel{margin-top:22px}.note{font-size:13px;color:#5b6573}footer{text-align:center;padding:22px;color:#5b6573}
+</style></head>
+<body>
+<header><h1>Online Placement Examination</h1><p>Internet Programming Lab — Experiment 44</p></header>
+<main>
+<p>Take a short sample quiz and see your score.</p>
+<input class="search" id="searchBox" placeholder="Search questions..." oninput="filterCards()">
+<div class="grid" id="cardGrid"><article class="card"><h3>HTML is used for?</h3><p>Sample question item for this experiment.</p><button onclick="selectItem(this, 'HTML is used for?')">Select</button></article>
+<article class="card"><h3>CSS is used for?</h3><p>Sample question item for this experiment.</p><button onclick="selectItem(this, 'CSS is used for?')">Select</button></article>
+<article class="card"><h3>JavaScript runs where?</h3><p>Sample question item for this experiment.</p><button onclick="selectItem(this, 'JavaScript runs where?')">Select</button></article>
+<article class="card"><h3>What is an array?</h3><p>Sample question item for this experiment.</p><button onclick="selectItem(this, 'What is an array?')">Select</button></article></div>
+
+<section class="panel"><h2>Mini Quiz</h2>
+<form id="quiz" onsubmit="gradeQuiz(event)">
+<p>1. HTML is mainly used for:</p><label><input type="radio" name="q1" value="a"> Styling</label><label><input type="radio" name="q1" value="b"> Page structure</label>
+<p>2. CSS is mainly used for:</p><label><input type="radio" name="q2" value="a"> Styling</label><label><input type="radio" name="q2" value="b"> Database storage</label>
+<p>3. JavaScript adds:</p><label><input type="radio" name="q3" value="a"> Interactivity</label><label><input type="radio" name="q3" value="b"> HTML tags only</label>
+<button type="submit">Submit Quiz</button></form><p id="score"></p></section>
+<script>function gradeQuiz(e){e.preventDefault();let f=new FormData(e.target),s=0;s+=f.get('q1')==='b';s+=f.get('q2')==='a';s+=f.get('q3')==='a';document.getElementById('score').textContent='Your score: '+s+'/3';}</script>
+<p class="note">Student practice version: this is a front-end demo. Login, database storage, real payments, email/SMS, live availability and admin security require a backend and are not implemented here.</p>
+</main><footer>Internet Programming Lab · Experiment 44</footer>
+<script>
+function filterCards(){let q=document.getElementById('searchBox').value.toLowerCase();document.querySelectorAll('.card').forEach(c=>c.style.display=c.innerText.toLowerCase().includes(q)?'':'none')}
+function selectItem(btn,item){document.getElementById('chosen')?.querySelector('option');let result=document.getElementById('formResult');if(result){let sel=document.getElementById('chosen');if(sel)sel.value=item;result.textContent=item+' selected.'}else{alert(item+' selected')}}
+</script></body></html>

@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Electricity Bill Calculator</title>
+<style>
+*{box-sizing:border-box}body{margin:0;font-family:Arial,sans-serif;background:#f4f7fb;color:#1d2939}
+header{background:#173b68;color:white;padding:24px 5%;}header p{margin-bottom:0}
+main{max-width:1000px;margin:24px auto;padding:0 16px}
+.search{width:100%;padding:12px;border:1px solid #ccd5e0;border-radius:8px;margin:10px 0 18px;font-size:16px}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:14px}
+.card,.panel{background:white;padding:18px;border-radius:12px;box-shadow:0 2px 8px #14213d12}
+button{background:#1769aa;color:white;border:0;padding:10px 14px;border-radius:7px;cursor:pointer}
+button:hover{background:#104d80}label{display:block;margin:12px 0}input,select{padding:9px;border:1px solid #ccd5e0;border-radius:6px;max-width:100%}
+.panel{margin-top:22px}.note{font-size:13px;color:#5b6573}footer{text-align:center;padding:22px;color:#5b6573}
+</style></head>
+<body>
+<header><h1>Electricity Bill Calculator</h1><p>Internet Programming Lab — Experiment 43</p></header>
+<main>
+<p>Calculate a sample electricity bill using the provided slab rates.</p>
+<input class="search" id="searchBox" placeholder="Search bill details..." oninput="filterCards()">
+<div class="grid" id="cardGrid"><article class="card"><h3>Domestic</h3><p>Sample bill detail item for this experiment.</p><button onclick="selectItem(this, 'Domestic')">Select</button></article>
+<article class="card"><h3>Commercial</h3><p>Sample bill detail item for this experiment.</p><button onclick="selectItem(this, 'Commercial')">Select</button></article></div>
+
+<section class="panel">
+<h2>Bill Calculator</h2>
+<label>Connection type <select id="connection"><option>Domestic</option><option>Commercial</option></select></label>
+<label>Units consumed <input id="units" type="number" min="0" value="150"></label>
+<button onclick="calculateBill()">Calculate Bill</button><p id="billResult" aria-live="polite"></p>
+</section>
+<script>
+function calculateBill(){
+ let u=Number(document.getElementById('units').value), type=document.getElementById('connection').value;
+ if(u<0){document.getElementById('billResult').textContent='Enter valid units.';return;}
+ let rates=type==='Domestic'?[1,2.5,4,6]:[2,4.5,6,7], bill=0;
+ let slabs=[100,100,300,Infinity], left=u;
+ for(let i=0;i<4;i++){let part=Math.min(left,slabs[i]);bill+=part*rates[i];left-=part;if(left<=0)break;}
+ document.getElementById('billResult').textContent='Estimated bill: ₹'+bill.toFixed(2);
+}
+</script>
+<p class="note">Student practice version: this is a front-end demo. Login, database storage, real payments, email/SMS, live availability and admin security require a backend and are not implemented here.</p>
+</main><footer>Internet Programming Lab · Experiment 43</footer>
+<script>
+function filterCards(){let q=document.getElementById('searchBox').value.toLowerCase();document.querySelectorAll('.card').forEach(c=>c.style.display=c.innerText.toLowerCase().includes(q)?'':'none')}
+function selectItem(btn,item){document.getElementById('chosen')?.querySelector('option');let result=document.getElementById('formResult');if(result){let sel=document.getElementById('chosen');if(sel)sel.value=item;result.textContent=item+' selected.'}else{alert(item+' selected')}}
+</script></body></html>

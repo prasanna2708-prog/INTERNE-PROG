@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Online Phone Bill Payment</title>
+    <style>
+        body {
+            font-family: Arial;
+            background: #eaf0f8;
+            text-align: center;
+        }
+        .box {
+            background: white;
+            width: 350px;
+            padding: 20px;
+            margin: 30px auto;
+            border-radius: 10px;
+            box-shadow: 0 0 10px #aaa;
+        }
+        input, select, button {
+            width: 90%;
+            padding: 10px;
+            margin: 8px;
+        }
+        button {
+            background: #2563eb;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+        h2 { color: #2563eb; }
+    </style>
+</head>
+<body>
+
+<h1>Online Phone Bill Payment System</h1>
+
+<div class="box" id="register">
+    <h2>Customer Registration</h2>
+    <input id="name" placeholder="Customer Name">
+    <input id="email" placeholder="Email">
+    <input id="regpass" type="password" placeholder="Password">
+    <button onclick="registerUser()">Register</button>
+</div>
+
+<div class="box" id="login">
+    <h2>Customer Login</h2>
+    <input id="username" placeholder="Email">
+    <input id="password" type="password" placeholder="Password">
+    <button onclick="loginUser()">Login</button>
+</div>
+
+<div class="box">
+    <h2>Admin Login</h2>
+    <input id="adminuser" placeholder="Admin Username">
+    <input id="adminpass" type="password" placeholder="Password">
+    <button onclick="adminLogin()">Admin Login</button>
+</div>
+
+<div class="box" id="admin" style="display:none">
+    <h2>Admin Dashboard</h2>
+    <input type="date" id="start">
+    <input type="date" id="end">
+    <input type="date" id="due">
+    <input type="number" id="amount" placeholder="Monthly Bill Amount">
+    <button onclick="updateBill()">Update Monthly Bill</button>
+    <p id="adminmsg"></p>
+</div>
+
+<div class="box" id="customer" style="display:none">
+    <h2>Customer Dashboard</h2>
+    <p id="welcome"></p>
+    <p>Bill Amount: ₹<span id="bill">0</span></p>
+    <p>Due Date: <span id="duedate">Not set</span></p>
+    <p>Fine Amount: ₹<span id="fine">0</span></p>
+    <p>Total Amount: ₹<span id="total">0</span></p>
+
+    <h3>Bill Payment</h3>
+    <input type="number" id="payamount" placeholder="Enter Amount">
+    <select id="method">
+        <option value="">Select Payment Method</option>
+        <option>Credit Card</option>
+        <option>Debit Card</option>
+        <option>Net Banking</option>
+        <option>Mobile Wallet</option>
+    </select>
+    <button onclick="payBill()">Pay Now</button>
+    <p id="message"></p>
+    <h3>Payment History</h3>
+    <ul id="history"></ul>
+</div>
+
+<script>
+let customer = null;
+let billAmount = 0;
+let dueDate = "";
+let users = [];
+let payments = [];
+
+function registerUser() {
+    let n = document.getElementById("name").value;
+    let e = document.getElementById("email").value;
+    let p = document.getElementById("regpass").value;
+
+    if (!n || !e || !p) {
+        alert("Enter all details");
+        return;
+    }
+
+    users.push({name:n, email:e, pass:p});
+    alert("Registration Successful!");
+}
+
+function loginUser() {
+    let e = document.getElementById("username").value;
+    let p = document.getElementById("password").value;
+
+    customer = users.find(u => u.email === e && u.pass === p);
+
+    if (customer) {
+        document.getElementById("customer").style.display = "block";
+        document.getElementById("welcome").innerText =
+            "Welcome " + customer.name;
+        showBill();
+    } else {
+        alert("Invalid Login Details");
+    }
+}
+
+function adminLogin() {
+    let u = document.getElementById("adminuser").value;
+    let p = document.getElementById("adminpass").value;
+
+    if (u === "admin" && p === "1234") {
+        document.getElementById("admin").style.display = "block";
+        alert("Admin Login Successful");
+    } else {
+        alert("Invalid Admin Login");
+    }
+}
+
+function updateBill() {
+    let s = document.getElementById("start").value;
+    let e = document.getElementById("end").value;
+    dueDate = document.getElementById("due").value;
+    billAmount = Number(document.getElementById("amount").value);
+
+    if (!s || !e || !dueDate || billAmount <= 0 ||
+        s > e || dueDate < s || dueDate > e) {
+        alert("Enter valid bill details");
+        return;
+    }
+
+    document.getElementById("adminmsg").innerText =
+        "Monthly Bill Updated Successfully!";
+}
+
+function showBill() {
+    let today = new Date();
+    let due = new Date(dueDate);
+    let fine = 0;
+
+    if (dueDate && today > due) {
+        fine = Math.floor((today - due) / 86400000) * 10;
+    }
+
+    document.getElementById("bill").innerText = billAmount;
+    document.getElementById("duedate").innerText = dueDate || "Not set";
+    document.getElementById("fine").innerText = fine;
+    document.getElementById("total").innerText =
+        billAmount + fine;
+    document.getElementById("payamount").value =
+        billAmount + fine;
+}
+
+function payBill() {
+    let amount = Number(document.getElementById("payamount").value);
+    let method = document.getElementById("method").value;
+    let total = Number(document.getElementById("total").innerText);
+
+    if (!method || amount <= 0 || amount > total) {
+        alert("Enter a valid amount and payment method");
+        return;
+    }
+
+    payments.push({
+        amount: amount,
+        method: method,
+        date: new Date().toLocaleDateString()
+    });
+
+    document.getElementById("message").innerText =
+        "Payment Successful! Amount: ₹" + amount;
+
+    let item = document.createElement("li");
+    item.innerText = "₹" + amount + " - " + method +
+        " - " + new Date().toLocaleDateString();
+    document.getElementById("history").appendChild(item);
+}
+</script>
+
+</body>
+</html>

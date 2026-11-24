@@ -1,0 +1,635 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Library Management System</title>
+    <style>
+        :root {
+            --primary: #4f46e5;
+            --primary-hover: #4338ca;
+            --bg: #f3f4f6;
+            --surface: #ffffff;
+            --text: #1f2937;
+            --border: #e5e7eb;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg);
+            color: var(--text);
+            line-height: 1.6;
+        }
+
+        header {
+            background-color: var(--surface);
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: var(--primary);
+        }
+
+        nav button {
+            background: none;
+            border: none;
+            padding: 0.5rem 1rem;
+            cursor: pointer;
+            font-weight: 600;
+            color: var(--text);
+        }
+
+        nav button:hover {
+            color: var(--primary);
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 2rem auto;
+            padding: 0 1rem;
+        }
+
+        .card {
+            background: var(--surface);
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+            padding: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        .form-group {
+            margin-bottom: 1rem;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+        }
+
+        .form-group input, .form-group select {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid var(--border);
+            border-radius: 4px;
+        }
+
+        .btn {
+            background-color: var(--primary);
+            color: white;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: background 0.3s;
+        }
+
+        .btn:hover {
+            background-color: var(--primary-hover);
+        }
+
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .dashboard-card {
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 1.5rem;
+            text-align: center;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .dashboard-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 15px rgba(0,0,0,0.1);
+            border-color: var(--primary);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 1rem;
+        }
+
+        th, td {
+            padding: 0.75rem;
+            text-align: left;
+            border-bottom: 1px solid var(--border);
+        }
+
+        th {
+            background-color: #f9fafb;
+            font-weight: 600;
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <div class="logo">EduLib</div>
+        <nav id="mainNav">
+            <button onclick="showView('loginView')" id="navLogin">Login</button>
+            <button onclick="showView('registerView')" id="navRegister">Register</button>
+            <button onclick="logout()" id="navLogout" class="hidden">Logout</button>
+        </nav>
+    </header>
+
+    <div class="container">
+        
+        <!-- Login View -->
+        <div id="loginView" class="card">
+            <h2>Login</h2>
+            <div class="form-group">
+                <label>Role</label>
+                <select id="loginRole">
+                    <option value="user">Student/User</option>
+                    <option value="admin">Librarian Admin</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>Username</label>
+                <input type="text" id="loginUsername" placeholder="Enter username">
+            </div>
+            <div class="form-group">
+                <label>Password</label>
+                <input type="password" id="loginPassword" placeholder="Enter password">
+            </div>
+            <button class="btn" onclick="login()">Login</button>
+        </div>
+
+        <!-- Register View -->
+        <div id="registerView" class="card hidden">
+            <h2>Student Registration</h2>
+            <div class="form-group">
+                <label>Full Name</label>
+                <input type="text" id="regName" placeholder="Enter full name">
+            </div>
+            <div class="form-group">
+                <label>Username</label>
+                <input type="text" id="regUsername" placeholder="Choose a username">
+            </div>
+            <div class="form-group">
+                <label>Password</label>
+                <input type="password" id="regPassword" placeholder="Choose a password">
+            </div>
+            <button class="btn" onclick="register()">Register</button>
+        </div>
+
+        <!-- Admin Dashboard -->
+        <div id="adminDashboard" class="hidden">
+            <div class="card">
+                <h2>Librarian Dashboard</h2>
+                <div class="dashboard-grid">
+                    <div class="dashboard-card" onclick="showAdminSection('manageBooks')">
+                        <h3>Manage Books</h3>
+                        <p>Add, Update, Delete</p>
+                    </div>
+                    <div class="dashboard-card" onclick="showAdminSection('issueReturn')">
+                        <h3>Issue / Return</h3>
+                        <p>Process book transactions</p>
+                    </div>
+                    <div class="dashboard-card" onclick="showAdminSection('manageFines')">
+                        <h3>Manage Fines</h3>
+                        <p>Calculate and collect fines</p>
+                    </div>
+                    <div class="dashboard-card" onclick="showAdminSection('manageMaterials')">
+                        <h3>Study Materials</h3>
+                        <p>Year/Semester wise materials</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Admin Sections -->
+            <div id="manageBooks" class="card admin-section hidden">
+                <h3>Add New Book</h3>
+                <div class="form-group"><input type="text" id="bookTitle" placeholder="Book Title"></div>
+                <div class="form-group"><input type="text" id="bookAuthor" placeholder="Author"></div>
+                <button class="btn" onclick="addBook()">Add Book</button>
+                <h3 style="margin-top: 2rem;">Book Inventory</h3>
+                <table>
+                    <thead><tr><th>Title</th><th>Author</th><th>Status</th><th>Actions</th></tr></thead>
+                    <tbody id="adminBookList"></tbody>
+                </table>
+            </div>
+
+            <div id="issueReturn" class="card admin-section hidden">
+                <h3>Issue Book</h3>
+                <div class="form-group"><input type="text" id="issueUsername" placeholder="Student Username"></div>
+                <div class="form-group"><input type="text" id="issueBookTitle" placeholder="Book Title"></div>
+                <button class="btn" onclick="issueBook()">Issue</button>
+            </div>
+
+            <div id="manageFines" class="card admin-section hidden">
+                <h3>Manage User Fines</h3>
+                <div class="form-group"><input type="text" id="fineUsername" placeholder="Student Username"></div>
+                <div class="form-group"><input type="number" id="fineAmount" placeholder="Fine Amount ($)"></div>
+                <button class="btn" onclick="addFine()">Add Fine</button>
+            </div>
+
+            <div id="manageMaterials" class="card admin-section hidden">
+                <h3>Manage Study Materials</h3>
+                <div class="form-group"><input type="text" id="matYear" placeholder="Year (e.g., 1, 2, 3)"></div>
+                <div class="form-group"><input type="text" id="matSemester" placeholder="Semester (e.g., 1, 2)"></div>
+                <div class="form-group"><input type="text" id="matTitle" placeholder="Material Title"></div>
+                <button class="btn" onclick="addMaterial()">Add Material</button>
+                <h3 style="margin-top: 2rem;">Materials List</h3>
+                <table>
+                    <thead><tr><th>Year</th><th>Semester</th><th>Title</th><th>Actions</th></tr></thead>
+                    <tbody id="adminMaterialList"></tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- User Dashboard -->
+        <div id="userDashboard" class="hidden">
+            <div class="card">
+                <h2 id="welcomeUser">Student Dashboard</h2>
+                <div class="dashboard-grid">
+                    <div class="dashboard-card" onclick="showUserSection('searchBooks')">
+                        <h3>Search Books</h3>
+                        <p>Find library catalog</p>
+                    </div>
+                    <div class="dashboard-card" onclick="showUserSection('borrowHistory')">
+                        <h3>Borrow History</h3>
+                        <p>Issue & Return dates</p>
+                    </div>
+                    <div class="dashboard-card" onclick="showUserSection('userFines')">
+                        <h3>My Fines</h3>
+                        <p>Check pending fines</p>
+                    </div>
+                    <div class="dashboard-card" onclick="showUserSection('searchMaterials')">
+                        <h3>Study Materials</h3>
+                        <p>Download materials</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- User Sections -->
+            <div id="searchBooks" class="card user-section hidden">
+                <h3>Search Library Catalog</h3>
+                <div class="form-group"><input type="text" id="searchInput" placeholder="Search by title or author..." onkeyup="searchCatalog()"></div>
+                <table>
+                    <thead><tr><th>Title</th><th>Author</th><th>Status</th></tr></thead>
+                    <tbody id="userBookList"></tbody>
+                </table>
+            </div>
+
+            <div id="borrowHistory" class="card user-section hidden">
+                <h3>My Borrow History</h3>
+                <table>
+                    <thead><tr><th>Book Title</th><th>Issue Date</th><th>Exp Date</th><th>Status</th></tr></thead>
+                    <tbody id="historyList"></tbody>
+                </table>
+            </div>
+
+            <div id="userFines" class="card user-section hidden">
+                <h3>My Fines</h3>
+                <h4 id="userTotalFines">Total Pending Fine: $0</h4>
+                <button class="btn" style="margin-top: 1rem;" onclick="payFine()">Pay Fine</button>
+            </div>
+
+            <div id="searchMaterials" class="card user-section hidden">
+                <h3>Search Study Materials</h3>
+                <div class="form-group"><input type="text" id="searchMatInput" placeholder="Search by Year, Semester or Title..." onkeyup="searchMaterialsUser()"></div>
+                <table>
+                    <thead><tr><th>Year</th><th>Semester</th><th>Title</th><th>Action</th></tr></thead>
+                    <tbody id="userMaterialList"></tbody>
+                </table>
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        // Mock Database in LocalStorage
+        if (!localStorage.getItem('books')) {
+            localStorage.setItem('books', JSON.stringify([
+                { id: 1, title: 'Introduction to Algorithms', author: 'Thomas H. Cormen', status: 'Available' },
+                { id: 2, title: 'Clean Code', author: 'Robert C. Martin', status: 'Available' }
+            ]));
+        }
+        if (!localStorage.getItem('users')) {
+            localStorage.setItem('users', JSON.stringify([]));
+        }
+        if (!localStorage.getItem('history')) {
+            localStorage.setItem('history', JSON.stringify([]));
+        }
+        if (!localStorage.getItem('materials')) {
+            localStorage.setItem('materials', JSON.stringify([]));
+        }
+
+        let currentUser = null;
+        let currentRole = null;
+
+        function showView(viewId) {
+            document.querySelectorAll('.container > div').forEach(div => div.classList.add('hidden'));
+            document.getElementById(viewId).classList.remove('hidden');
+        }
+
+        function hideAllSections() {
+            document.querySelectorAll('.admin-section, .user-section').forEach(el => el.classList.add('hidden'));
+        }
+
+        function showAdminSection(id) {
+            hideAllSections();
+            document.getElementById(id).classList.remove('hidden');
+            if (id === 'manageBooks') renderAdminBooks();
+            if (id === 'manageMaterials') renderAdminMaterials();
+        }
+
+        function showUserSection(id) {
+            hideAllSections();
+            document.getElementById(id).classList.remove('hidden');
+            if (id === 'searchBooks') renderUserBooks();
+            if (id === 'borrowHistory') renderHistory();
+            if (id === 'userFines') renderUserFines();
+            if (id === 'searchMaterials') renderUserMaterials();
+        }
+
+        function register() {
+            const name = document.getElementById('regName').value;
+            const username = document.getElementById('regUsername').value;
+            const pass = document.getElementById('regPassword').value;
+            
+            let users = JSON.parse(localStorage.getItem('users'));
+            users.push({ name, username, pass, fines: 0 });
+            localStorage.setItem('users', JSON.stringify(users));
+            alert('Registered successfully! Please login.');
+            showView('loginView');
+        }
+
+        function login() {
+            const role = document.getElementById('loginRole').value;
+            const user = document.getElementById('loginUsername').value;
+            const pass = document.getElementById('loginPassword').value;
+
+            if (role === 'admin' && user === 'admin' && pass === 'admin') {
+                currentUser = 'admin';
+                currentRole = 'admin';
+                updateNav();
+                showView('adminDashboard');
+            } else if (role === 'user') {
+                let users = JSON.parse(localStorage.getItem('users'));
+                let found = users.find(u => u.username === user && u.pass === pass);
+                if (found) {
+                    currentUser = found.username;
+                    currentRole = 'user';
+                    document.getElementById('welcomeUser').innerText = `Welcome, ${found.name}`;
+                    updateNav();
+                    showView('userDashboard');
+                } else {
+                    alert('Invalid credentials!');
+                }
+            }
+        }
+
+        function logout() {
+            currentUser = null;
+            currentRole = null;
+            updateNav();
+            showView('loginView');
+            hideAllSections();
+        }
+
+        function updateNav() {
+            if (currentUser) {
+                document.getElementById('navLogin').classList.add('hidden');
+                document.getElementById('navRegister').classList.add('hidden');
+                document.getElementById('navLogout').classList.remove('hidden');
+            } else {
+                document.getElementById('navLogin').classList.remove('hidden');
+                document.getElementById('navRegister').classList.remove('hidden');
+                document.getElementById('navLogout').classList.add('hidden');
+            }
+        }
+
+        // Admin Functions
+        function addBook() {
+            const title = document.getElementById('bookTitle').value;
+            const author = document.getElementById('bookAuthor').value;
+            if(!title || !author) return;
+            
+            let books = JSON.parse(localStorage.getItem('books'));
+            books.push({ id: Date.now(), title, author, status: 'Available' });
+            localStorage.setItem('books', JSON.stringify(books));
+            renderAdminBooks();
+        }
+
+        function deleteBook(id) {
+            let books = JSON.parse(localStorage.getItem('books'));
+            books = books.filter(b => b.id !== id);
+            localStorage.setItem('books', JSON.stringify(books));
+            renderAdminBooks();
+        }
+
+        function renderAdminBooks() {
+            let books = JSON.parse(localStorage.getItem('books'));
+            let tbody = document.getElementById('adminBookList');
+            tbody.innerHTML = '';
+            books.forEach(b => {
+                tbody.innerHTML += `<tr>
+                    <td>${b.title}</td>
+                    <td>${b.author}</td>
+                    <td>${b.status}</td>
+                    <td><button onclick="deleteBook(${b.id})">Delete</button></td>
+                </tr>`;
+            });
+        }
+
+        function issueBook() {
+            const username = document.getElementById('issueUsername').value;
+            const title = document.getElementById('issueBookTitle').value;
+            
+            let books = JSON.parse(localStorage.getItem('books'));
+            let history = JSON.parse(localStorage.getItem('history'));
+            
+            let book = books.find(b => b.title.toLowerCase() === title.toLowerCase() && b.status === 'Available');
+            if (book) {
+                book.status = 'Issued';
+                localStorage.setItem('books', JSON.stringify(books));
+                
+                let issueDate = new Date().toLocaleDateString();
+                let expDate = new Date(Date.now() + 14*24*60*60*1000).toLocaleDateString(); // 14 days
+                
+                history.push({ username, bookTitle: book.title, issueDate, expDate, status: 'Borrowed' });
+                localStorage.setItem('history', JSON.stringify(history));
+                
+                alert('Book issued successfully!');
+            } else {
+                alert('Book not available or not found!');
+            }
+        }
+
+        function addFine() {
+            const username = document.getElementById('fineUsername').value;
+            const amount = parseFloat(document.getElementById('fineAmount').value);
+            if(!username || isNaN(amount)) return;
+            
+            let users = JSON.parse(localStorage.getItem('users'));
+            let user = users.find(u => u.username === username);
+            if(user) {
+                user.fines = (user.fines || 0) + amount;
+                localStorage.setItem('users', JSON.stringify(users));
+                alert(`Fine of $${amount} added for ${username}.`);
+            } else {
+                alert('User not found!');
+            }
+        }
+
+        function addMaterial() {
+            const year = document.getElementById('matYear').value;
+            const semester = document.getElementById('matSemester').value;
+            const title = document.getElementById('matTitle').value;
+            if(!year || !semester || !title) return;
+
+            let materials = JSON.parse(localStorage.getItem('materials'));
+            materials.push({ id: Date.now(), year, semester, title });
+            localStorage.setItem('materials', JSON.stringify(materials));
+            renderAdminMaterials();
+        }
+
+        function deleteMaterial(id) {
+            let materials = JSON.parse(localStorage.getItem('materials'));
+            materials = materials.filter(m => m.id !== id);
+            localStorage.setItem('materials', JSON.stringify(materials));
+            renderAdminMaterials();
+        }
+
+        function renderAdminMaterials() {
+            let materials = JSON.parse(localStorage.getItem('materials'));
+            let tbody = document.getElementById('adminMaterialList');
+            tbody.innerHTML = '';
+            materials.forEach(m => {
+                tbody.innerHTML += `<tr>
+                    <td>${m.year}</td>
+                    <td>${m.semester}</td>
+                    <td>${m.title}</td>
+                    <td><button onclick="deleteMaterial(${m.id})">Delete</button></td>
+                </tr>`;
+            });
+        }
+
+        // User Functions
+        function renderUserBooks() {
+            let books = JSON.parse(localStorage.getItem('books'));
+            let tbody = document.getElementById('userBookList');
+            tbody.innerHTML = '';
+            books.forEach(b => {
+                tbody.innerHTML += `<tr>
+                    <td>${b.title}</td>
+                    <td>${b.author}</td>
+                    <td>${b.status}</td>
+                </tr>`;
+            });
+        }
+
+        function searchCatalog() {
+            let term = document.getElementById('searchInput').value.toLowerCase();
+            let books = JSON.parse(localStorage.getItem('books'));
+            let filtered = books.filter(b => b.title.toLowerCase().includes(term) || b.author.toLowerCase().includes(term));
+            
+            let tbody = document.getElementById('userBookList');
+            tbody.innerHTML = '';
+            filtered.forEach(b => {
+                tbody.innerHTML += `<tr>
+                    <td>${b.title}</td>
+                    <td>${b.author}</td>
+                    <td>${b.status}</td>
+                </tr>`;
+            });
+        }
+
+        function renderHistory() {
+            let history = JSON.parse(localStorage.getItem('history'));
+            let myHistory = history.filter(h => h.username === currentUser);
+            
+            let tbody = document.getElementById('historyList');
+            tbody.innerHTML = '';
+            myHistory.forEach(h => {
+                tbody.innerHTML += `<tr>
+                    <td>${h.bookTitle}</td>
+                    <td>${h.issueDate}</td>
+                    <td>${h.expDate}</td>
+                    <td>${h.status}</td>
+                </tr>`;
+            });
+        }
+
+        function renderUserFines() {
+            let users = JSON.parse(localStorage.getItem('users'));
+            let user = users.find(u => u.username === currentUser);
+            document.getElementById('userTotalFines').innerText = `Total Pending Fine: $${user ? (user.fines || 0) : 0}`;
+        }
+
+        function payFine() {
+            let users = JSON.parse(localStorage.getItem('users'));
+            let userIndex = users.findIndex(u => u.username === currentUser);
+            if(userIndex !== -1 && users[userIndex].fines > 0) {
+                users[userIndex].fines = 0;
+                localStorage.setItem('users', JSON.stringify(users));
+                alert('Fine paid successfully!');
+                renderUserFines();
+            } else {
+                alert('No fines to pay.');
+            }
+        }
+
+        function renderUserMaterials() {
+            let materials = JSON.parse(localStorage.getItem('materials'));
+            let tbody = document.getElementById('userMaterialList');
+            tbody.innerHTML = '';
+            materials.forEach(m => {
+                tbody.innerHTML += `<tr>
+                    <td>${m.year}</td>
+                    <td>${m.semester}</td>
+                    <td>${m.title}</td>
+                    <td><button onclick="alert('Downloading ${m.title}...')">Download</button></td>
+                </tr>`;
+            });
+        }
+
+        function searchMaterialsUser() {
+            let term = document.getElementById('searchMatInput').value.toLowerCase();
+            let materials = JSON.parse(localStorage.getItem('materials'));
+            let filtered = materials.filter(m => 
+                m.year.toLowerCase().includes(term) || 
+                m.semester.toLowerCase().includes(term) || 
+                m.title.toLowerCase().includes(term)
+            );
+            
+            let tbody = document.getElementById('userMaterialList');
+            tbody.innerHTML = '';
+            filtered.forEach(m => {
+                tbody.innerHTML += `<tr>
+                    <td>${m.year}</td>
+                    <td>${m.semester}</td>
+                    <td>${m.title}</td>
+                    <td><button onclick="alert('Downloading ${m.title}...')">Download</button></td>
+                </tr>`;
+            });
+        }
+
+    </script>
+</body>
+</html>
